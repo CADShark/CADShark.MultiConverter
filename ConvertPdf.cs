@@ -1,15 +1,12 @@
-﻿using System;
-using CADShark.Common.Logging;
+﻿using CADShark.Common.Logging;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
-using System.IO;
-using CADShark.MultiConverter.sln;
+using System;
 
 namespace CADShark.Common.MultiConverter
 {
     internal class ConvertPdf : ConvertBuilder
     {
-        private static string _filepath;
         private static readonly CadLogger Logger = CadLogger.GetLogger(className: nameof(ConvertPdf));
 
         internal static void ExportFile()
@@ -22,11 +19,6 @@ namespace CADShark.Common.MultiConverter
 
                 var swModel = (ModelDoc2)SwApp.ActiveDoc;
                 Logger.Trace($"ExportFile {swModel.GetTitle()}");
-                _filepath = swModel.GetPathName();
-
-                //_helper.SuppressUpdates(false);
-
-                var pdfPath = GetPath();
 
                 var swDrawDoc = (DrawingDoc)swModel;
                 var sheetNames = (string[])swDrawDoc.GetSheetNames();
@@ -43,29 +35,17 @@ namespace CADShark.Common.MultiConverter
                     }
                 }
 
-                boolStatus = swModel.Extension.SaveAs3(pdfPath, (int)swSaveAsVersion_e.swSaveAsCurrentVersion,
+                boolStatus = swModel.Extension.SaveAs3(FilePath, (int)swSaveAsVersion_e.swSaveAsCurrentVersion,
                     (int)swSaveAsOptions_e.swSaveAsOptions_UpdateInactiveViews, null, null, errors, warnings);
 
                 Logger.Info($"SaveAs Status: {boolStatus}");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Logger.Info($"SaveAs Status: {e.Message}");
+                Logger.Error($"Export PDF Status is False", ex);
                 throw;
             }
         }
 
-        private static string GetPath()
-        {
-            var folderToSavePdf = Path.GetDirectoryName(_filepath);
-            // ReSharper disable once AssignNullToNotNullAttribute
-            var fullPath = Path.Combine(folderToSavePdf, "PDF");
-            Directory.CreateDirectory(fullPath);
-
-            var pdfName = Path.GetFileName(_filepath).Replace(".SLDDRW", ".PDF");
-            var pdfPath = Path.Combine(fullPath, pdfName);
-
-            return pdfPath;
-        }
     }
 }

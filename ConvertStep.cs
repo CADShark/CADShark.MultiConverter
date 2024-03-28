@@ -2,7 +2,6 @@
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System.IO;
-using CADShark.MultiConverter.sln;
 
 namespace CADShark.Common.MultiConverter
 {
@@ -11,6 +10,7 @@ namespace CADShark.Common.MultiConverter
         private static readonly CadLogger Logger = CadLogger.GetLogger(className: nameof(ConvertStep));
         private static ModelDoc2 _swModel;
         private static string _configName;
+        public static string StepPath;
 
         internal static void ExportFile()
         {
@@ -42,8 +42,10 @@ namespace CADShark.Common.MultiConverter
 
         private static string CreatePath()
         {
-            var modelfolder = Path.GetDirectoryName(_swModel.GetPathName());
-            var folderToSaveStep = Path.Combine(modelfolder, "STEP");
+            var filePath = string.Empty;
+            var directoryName = Path.GetDirectoryName(_swModel.GetPathName());
+            if (directoryName == null) return filePath;
+            var folderToSaveStep = Path.Combine(directoryName, "STEP");
             var fileName = _swModel.GetTitle();
             var fullName = $"{fileName}-{_configName}.STEP";
 
@@ -52,7 +54,8 @@ namespace CADShark.Common.MultiConverter
                 Directory.CreateDirectory(folderToSaveStep);
             }
 
-            var filePath = Path.Combine(folderToSaveStep, fullName);
+            filePath = Path.Combine(folderToSaveStep, fullName);
+
             return filePath;
         }
     }

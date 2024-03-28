@@ -2,7 +2,6 @@
 using SolidWorks.Interop.sldworks;
 using System;
 using System.IO;
-using CADShark.MultiConverter.sln;
 
 namespace CADShark.Common.MultiConverter
 {

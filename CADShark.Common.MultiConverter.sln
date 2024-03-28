@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34714.143
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CADShark.MultiConverter.sln", "CADShark.MultiConverter.csproj", "{98745C50-F699-4260-808C-71371D452F98}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CADShark.Common.MultiConverter.sln", "CADShark.Common.MultiConverter.csproj", "{98745C50-F699-4260-808C-71371D452F98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

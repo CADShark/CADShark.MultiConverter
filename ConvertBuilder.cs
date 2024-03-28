@@ -1,17 +1,18 @@
-﻿using System;
-using System.IO;
-using CADShark.Common.Logging;
-using CADShark.Common.MultiConverter;
+﻿using CADShark.Common.Logging;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
+using System;
+using System.IO;
 
-namespace CADShark.MultiConverter.sln
+namespace CADShark.Common.MultiConverter
 {
     public class ConvertBuilder
     {
         private static readonly CadLogger Logger = CadLogger.GetLogger(className: nameof(ConvertBuilder));
 
         internal static SldWorks SwApp;
+        public static string FilePath;
+        
 
         public ConvertBuilder()
         {
@@ -81,11 +82,11 @@ namespace CADShark.MultiConverter.sln
             }
         }
 
-        public string PathBuilder(string path, string extension, string config = null, string newSavePath = null)
+        public void PathBuilder(string path, string extension, string config = null, string newSavePath = null)
         {
             var directoryName = Path.GetDirectoryName(path);
 
-            var fileName = Path.GetFileName(path);
+            var fileName = Path.GetFileNameWithoutExtension(path);
 
             var folderToSaveStep = newSavePath == null
                 ? Path.Combine(directoryName, extension.ToUpper())
@@ -98,9 +99,8 @@ namespace CADShark.MultiConverter.sln
                 Directory.CreateDirectory(folderToSaveStep);
             }
 
-            var filePath = Path.Combine(folderToSaveStep, fullName);
+            FilePath = Path.Combine(folderToSaveStep, fullName);
 
-            return filePath;
         }
     }
 }
