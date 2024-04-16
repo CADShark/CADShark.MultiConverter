@@ -12,7 +12,7 @@ namespace CADShark.Common.MultiConverter
 
         internal static SldWorks SwApp;
         public static string FilePath;
-        
+
 
         public ConvertBuilder()
         {
@@ -25,12 +25,12 @@ namespace CADShark.Common.MultiConverter
 
         public void ConvertToPdf()
         {
-            ConvertPdf.ExportFile();
+            ConvertPdf.ExportFile2();
         }
 
-        public void ConvertToDxf(out byte[] dxfByteCode, bool isSheetmetal)
+        public void ConvertToDxf(bool isSheetMetal)
         {
-            ConvertDxf.ExportFile(out dxfByteCode, isSheetmetal);
+            ConvertDxf.ExportFile(isSheetMetal);
         }
 
         public void ConvertToStep()
@@ -41,17 +41,17 @@ namespace CADShark.Common.MultiConverter
         public bool IsSheetMetalComponent()
         {
             var swModel = (ModelDoc2)SwApp.ActiveDoc;
-
             var status = false;
+
             if (!(swModel is IPartDoc swPart)) return false;
 
             var vBodies = (object[])swPart.GetBodies2(0, false);
 
             if (vBodies == null) return false;
 
-            for (var i = 0; i < vBodies.Length; i++)
+            foreach (var body in vBodies)
             {
-                var swBody = (Body2)vBodies[i];
+                var swBody = (Body2)body;
                 status = swBody.IsSheetMetal();
             }
 
@@ -88,9 +88,8 @@ namespace CADShark.Common.MultiConverter
 
             var fileName = Path.GetFileNameWithoutExtension(path);
 
-            var folderToSaveStep = newSavePath == null
-                ? Path.Combine(directoryName, extension.ToUpper())
-                : newSavePath;
+            if (directoryName == null) return;
+            var folderToSaveStep = newSavePath ?? Path.Combine(directoryName, extension.ToUpper());
 
             var fullName = config != null ? $"{fileName}-{config}.{extension}" : $"{fileName}.{extension}";
 
@@ -100,7 +99,6 @@ namespace CADShark.Common.MultiConverter
             }
 
             FilePath = Path.Combine(folderToSaveStep, fullName);
-
         }
     }
 }

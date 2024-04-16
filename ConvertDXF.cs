@@ -1,38 +1,23 @@
 ﻿using CADShark.Common.Logging;
 using SolidWorks.Interop.sldworks;
 using System;
-using System.IO;
 
 namespace CADShark.Common.MultiConverter
 {
     internal class ConvertDxf : ConvertBuilder
     {
-
         private static readonly CadLogger Logger = CadLogger.GetLogger(className: nameof(ConvertDxf));
 
-        internal static bool ExportFile(out byte[] dxfByteCode, bool isSheetmetal)
+        internal static bool ExportFile(bool isSheetmetal)
         {
             var swModel = (ModelDoc2)SwApp.ActiveDoc;
             var configManager = swModel.ConfigurationManager;
             var configName = configManager.ActiveConfiguration.Name;
 
-            dxfByteCode = new byte[] { };
             // ReSharper disable once SuspiciousTypeConversion.Global
             var partDoc = swModel as IPartDoc;
             try
             {
-                var modelfolder = Path.GetDirectoryName(swModel.GetPathName());
-
-                Logger.Trace($"modelfolder {modelfolder}");
-                var folderToSaveDxf = Path.Combine(modelfolder, "DXF");
-
-                if (!Directory.Exists(folderToSaveDxf))
-                {
-                    Directory.CreateDirectory(folderToSaveDxf);
-                }
-
-                var filePath = Path.Combine(folderToSaveDxf, DxfNameBuild(swModel.GetTitle(), configName));
-
                 var alignment = (object)new[]
                 {
                     0.0,
@@ -53,7 +38,7 @@ namespace CADShark.Common.MultiConverter
                 var action = isSheetmetal ? 1 : 2;
                 object views = isSheetmetal ? 0 : 3;
 
-                Logger.Trace($"Path export: {filePath}");
+                Logger.Trace($"Path export: {FilePath}");
 
                 if (partDoc == null)
                 {
@@ -61,12 +46,11 @@ namespace CADShark.Common.MultiConverter
                     return false;
                 }
 
-                var status = partDoc.ExportToDWG2(filePath, modelName, action, true, alignment, false, false, options,
+                var status = partDoc.ExportToDWG2(FilePath, modelName, action, true, alignment, false, false, options,
                     views);
 
                 Logger.Trace($"Status export: {status} Configuration: {configName}");
                 return status;
-                
             }
             catch (Exception ex)
             {
@@ -74,12 +58,6 @@ namespace CADShark.Common.MultiConverter
                 Logger.Error(error);
                 return false;
             }
-
-        }
-
-        private static string DxfNameBuild(string fileName, string config)
-        {
-            return $"{fileName.ToUpper().Replace(".SLDPRT", "")}-{config}.DXF";
         }
 
         private static int SheetMetalOptions(
