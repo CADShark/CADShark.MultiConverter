@@ -3,6 +3,7 @@ using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System;
 using System.IO;
+//using KompasAPI7;
 
 namespace CADShark.Common.MultiConverter
 {
@@ -11,6 +12,7 @@ namespace CADShark.Common.MultiConverter
         private static readonly CadLogger Logger = CadLogger.GetLogger(className: nameof(ConvertBuilder));
 
         internal static SldWorks SwApp;
+        //internal static IKompasDocument2D Document2D;
         public static string FilePath;
 
 
@@ -23,10 +25,19 @@ namespace CADShark.Common.MultiConverter
             SwApp = swApp;
         }
 
+        //public ConvertBuilder(IKompasDocument2D document2D)
+        //{
+        //    Document2D = document2D;
+        //}
+
         public void ConvertToPdf()
         {
             ConvertPdf.ExportFile2();
         }
+        //public bool KompasToPdf()
+        //{
+        //    return ConvertPdf.KompasExportFile();
+        //}
 
         public void ConvertToDxf(bool isSheetMetal)
         {
@@ -97,7 +108,7 @@ namespace CADShark.Common.MultiConverter
             {
                 Directory.CreateDirectory(folderToSaveStep);
             }
-
+            
             FilePath = Path.Combine(folderToSaveStep, fullName);
         }
     }
