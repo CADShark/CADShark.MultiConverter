@@ -3,113 +3,93 @@ using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System;
 using System.IO;
-//using KompasAPI7;
 
-namespace CADShark.Common.MultiConverter
+
+namespace CADShark.Common.MultiConverter;
+
+/// <summary>
+/// Main class for converting SolidWorks files
+/// </summary>
+public class ConvertBuilder(ISldWorks swApp)
 {
-    public class ConvertBuilder
+    private static readonly CadLogger Logger = CadLogger.GetLogger<ConvertBuilder>();
+    public string FilePath { get; private set; }
+
+    public void ConvertToPdf(ModelDoc2 swModel)
     {
-        private static readonly CadLogger Logger = CadLogger.GetLogger(className: nameof(ConvertBuilder));
+        var pdfConverter = new ConvertPdf(swApp, FilePath);
+        pdfConverter.Export(swModel);
+    }
 
-        internal static SldWorks SwApp;
-        //internal static IKompasDocument2D Document2D;
-        public static string FilePath;
+    public void ConvertToDxf(bool isSheetMetal)
+    {
+        var dxfConverter = new ConvertDxf(swApp, FilePath);
+        dxfConverter.ExportFile(isSheetMetal);
+    }
 
+    public void ConvertToStep()
+    {
+        var stepConverter = new ConvertStep(swApp, FilePath);
+        stepConverter.ExportFile();
+    }
 
-        public ConvertBuilder()
+    public bool IsSheetMetalComponent()
+    {
+        var swModel = (ModelDoc2)swApp.ActiveDoc;
+        var status = false;
+
+        if (!(swModel is IPartDoc swPart)) return false;
+
+        var vBodies = (object[])swPart.GetBodies2(0, false);
+
+        if (vBodies == null) return false;
+
+        foreach (var body in vBodies)
         {
+            var swBody = (Body2)body;
+            status = swBody.IsSheetMetal();
         }
 
-        public ConvertBuilder(SldWorks swApp)
-        {
-            SwApp = swApp;
-        }
+        return status;
+    }
 
-        //public ConvertBuilder(IKompasDocument2D document2D)
-        //{
-        //    Document2D = document2D;
-        //}
-
-        public void ConvertToPdf()
+    public bool IsSheetMetalComponent(Component2 component)
+    {
+        try
         {
-            ConvertPdf.ExportFile2();
-        }
-        //public bool KompasToPdf()
-        //{
-        //    return ConvertPdf.KompasExportFile();
-        //}
-
-        public void ConvertToDxf(bool isSheetMetal)
-        {
-            ConvertDxf.ExportFile(isSheetMetal);
-        }
-
-        public void ConvertToStep()
-        {
-            ConvertStep.ExportFile();
-        }
-
-        public bool IsSheetMetalComponent()
-        {
-            var swModel = (ModelDoc2)SwApp.ActiveDoc;
             var status = false;
-
-            if (!(swModel is IPartDoc swPart)) return false;
-
-            var vBodies = (object[])swPart.GetBodies2(0, false);
+            var vBodies = (object[])component.GetBodies3((int)swBodyType_e.swSolidBody, out _);
 
             if (vBodies == null) return false;
 
-            foreach (var body in vBodies)
+            for (var i = 0; i < vBodies.Length; i++)
             {
-                var swBody = (Body2)body;
+                var swBody = (Body2)vBodies[i];
                 status = swBody.IsSheetMetal();
             }
 
             return status;
         }
-
-        public bool IsSheetMetalComponent(Component2 component)
+        catch (Exception e)
         {
-            try
-            {
-                var status = false;
-                var vBodies = (object[])component.GetBodies3((int)swBodyType_e.swSolidBody, out _);
-
-                if (vBodies == null) return false;
-
-                for (var i = 0; i < vBodies.Length; i++)
-                {
-                    var swBody = (Body2)vBodies[i];
-                    status = swBody.IsSheetMetal();
-                }
-
-                return status;
-            }
-            catch (Exception e)
-            {
-                Logger.Error($"IsSheetMetalComponent (Component2) {e.Message}");
-                throw;
-            }
+            Logger.Error($"IsSheetMetalComponent (Component2) {e.Message}");
+            throw;
         }
+    }
 
-        public void PathBuilder(string path, string extension, string config = null, string newSavePath = null)
-        {
-            var directoryName = Path.GetDirectoryName(path);
+    public void BuildFilePath(string path, string extension, string config = null, string newSavePath = null)
+    {
+        var directoryName = Path.GetDirectoryName(path);
 
-            var fileName = Path.GetFileNameWithoutExtension(path);
+        var fileName = Path.GetFileNameWithoutExtension(path);
 
-            if (directoryName == null) return;
-            var folderToSaveStep = newSavePath ?? Path.Combine(directoryName, extension.ToUpper());
+        if (directoryName == null) return;
+        var folderToSaveStep = newSavePath ?? Path.Combine(directoryName, extension.ToUpper());
 
-            var fullName = config != null ? $"{fileName}-{config}.{extension}" : $"{fileName}.{extension}";
+        var fullName = config != null ? $"{fileName}-{config}.{extension}" : $"{fileName}.{extension}";
 
-            if (!Directory.Exists(folderToSaveStep))
-            {
-                Directory.CreateDirectory(folderToSaveStep);
-            }
-            
-            FilePath = Path.Combine(folderToSaveStep, fullName);
-        }
+        if (!Directory.Exists(folderToSaveStep)) Directory.CreateDirectory(folderToSaveStep);
+
+        FilePath = Path.Combine(folderToSaveStep, fullName);
     }
 }

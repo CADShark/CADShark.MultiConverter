@@ -4,13 +4,13 @@ using System;
 
 namespace CADShark.Common.MultiConverter
 {
-    internal class ConvertDxf : ConvertBuilder
+    internal class ConvertDxf(ISldWorks swApp, string filePath)
     {
-        private static readonly CadLogger Logger = CadLogger.GetLogger(className: nameof(ConvertDxf));
+        private static readonly CadLogger Logger = CadLogger.GetLogger<ConvertDxf>();
 
-        internal static bool ExportFile(bool isSheetmetal)
+        internal bool ExportFile(bool isSheetmetal)
         {
-            var swModel = (ModelDoc2)SwApp.ActiveDoc;
+            var swModel = (ModelDoc2)swApp.ActiveDoc;
             var configManager = swModel.ConfigurationManager;
             var configName = configManager.ActiveConfiguration.Name;
 
@@ -38,7 +38,7 @@ namespace CADShark.Common.MultiConverter
                 var action = isSheetmetal ? 1 : 2;
                 object views = isSheetmetal ? 0 : 3;
 
-                Logger.Trace($"Path export: {FilePath}");
+                Logger.Trace($"Path export: {filePath}");
 
                 if (partDoc == null)
                 {
@@ -46,7 +46,7 @@ namespace CADShark.Common.MultiConverter
                     return false;
                 }
 
-                var status = partDoc.ExportToDWG2(FilePath, modelName, action, true, alignment, false, false, options,
+                var status = partDoc.ExportToDWG2(filePath, modelName, action, true, alignment, false, false, options,
                     views);
 
                 Logger.Trace($"Status export: {status} Configuration: {configName}");
