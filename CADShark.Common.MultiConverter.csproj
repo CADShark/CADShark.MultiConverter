@@ -61,12 +61,19 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConvertBuilder.cs" />
-    <Compile Include="ConvertDXF.cs" />
-    <Compile Include="ConvertPdf.cs" />
-    <Compile Include="ConvertStep.cs" />
+    <Compile Include="Converters\BaseConverter.cs" />
+    <Compile Include="Converters\DXFConverter.cs" />
+    <Compile Include="Converters\DxfExportOptions.cs" />
+    <Compile Include="Converters\IConverter.cs" />
+    <Compile Include="Converters\PdfConverter.cs" />
+    <Compile Include="CutListExtractor\CutListItem.cs" />
+    <Compile Include="CutListExtractor\SheetMetalCutListExtractor.cs" />
+    <Compile Include="Converters\StepConverter.cs" />
     <Compile Include="Exceptions\SaveDocumentFailedException.cs" />
+    <Compile Include="IConverterFactory.cs" />
+    <Compile Include="IFilePathBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\FilePathBuilder.cs" />
     <Compile Include="swFileSaveWarning.cs" />
     <Compile Include="SwSaveOperation.cs" />
   </ItemGroup>
