@@ -1,6 +1,8 @@
 ﻿using CADShark.Common.Logging;
+using CADShark.Common.MultiConverter.Extractors;
 using SolidWorks.Interop.sldworks;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CADShark.Common.MultiConverter.Converters;
@@ -10,7 +12,7 @@ namespace CADShark.Common.MultiConverter.Converters;
 /// </summary>
 public class DxfConvert(ISldWorks swApp) : BaseConverter(swApp)
 {
-    private static readonly CadLogger Logger = CadLogger.GetLogger<DxfConvert>();
+    private new static readonly CadLogger Logger = CadLogger.GetLogger<DxfConvert>();
 
     /// <summary>
     /// Gets or sets the export options for DXF.
@@ -88,4 +90,30 @@ public class DxfConvert(ISldWorks swApp) : BaseConverter(swApp)
 
         return vBodies.Cast<Body2>().Any(swBody => swBody.IsSheetMetal());
     }
+
+    /// <summary>
+    /// Extracts cut-list data for the given model.
+    /// </summary>
+    /// <param name="model">The SolidWorks model document.</param>
+    /// <returns>List of CutListItem for the model, or empty list if none found.</returns>
+    //public override List<CutListItem> GetCutListData(ModelDoc2 model)
+    //{
+    //    Logger.Info($"Extracting cut-list data for {model?.GetTitle()}");
+    //    try
+    //    {
+    //        var extractor = new SheetMetalCutListExtractor(model);
+    //        if (extractor.LoadCutList())
+    //        {
+    //            Logger.Info($"Extracted {extractor.CutListItems.Count} cut-list items");
+    //            return extractor.CutListItems;
+    //        }
+    //        Logger.Warning("No cut-list items found");
+    //        return [];
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Logger.Error($"Error extracting cut-list data for {model?.GetTitle()}", ex);
+    //        return [];
+    //    }
+    //}
 }

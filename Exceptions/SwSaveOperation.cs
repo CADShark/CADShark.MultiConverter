@@ -1,7 +1,7 @@
-﻿using SolidWorks.Interop.swconst;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using SolidWorks.Interop.swconst;
 
-namespace CADShark.Common.MultiConverter
+namespace CADShark.Common.MultiConverter.Exceptions
 {
     internal class SwSaveOperation
     {

@@ -1,4 +1,5 @@
 ﻿using CADShark.Common.Logging;
+using CADShark.Common.MultiConverter.Exceptions;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System;
@@ -14,7 +15,7 @@ namespace CADShark.Common.MultiConverter.Converters;
 /// </summary>
 public class PdfConverter(ISldWorks swApp) : BaseConverter(swApp)
 {
-    private static readonly CadLogger Logger = CadLogger.GetLogger<PdfConverter>();
+    private new static readonly CadLogger Logger = CadLogger.GetLogger<PdfConverter>();
 
     /// <summary>
     /// Resolves all views in the drawing to full resolution.

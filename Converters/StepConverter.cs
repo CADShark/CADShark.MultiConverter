@@ -1,4 +1,5 @@
 ﻿using CADShark.Common.Logging;
+using CADShark.Common.MultiConverter.Exceptions;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System;
@@ -10,7 +11,7 @@ namespace CADShark.Common.MultiConverter.Converters;
 /// </summary>
 public class StepConverter(ISldWorks swApp) : BaseConverter(swApp)
 {
-    private static readonly CadLogger Logger = CadLogger.GetLogger<StepConverter>();
+    private new static readonly CadLogger Logger = CadLogger.GetLogger<StepConverter>();
 
     /// <summary>
     /// Performs the STEP export.

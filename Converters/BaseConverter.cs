@@ -1,44 +1,46 @@
-﻿using SolidWorks.Interop.sldworks;
+﻿using CADShark.Common.Logging;
+using CADShark.Common.MultiConverter.Core;
+using SolidWorks.Interop.sldworks;
+using System;
+using System.Collections.Generic;
+using CADShark.Common.MultiConverter.Extractors;
 
-
-namespace CADShark.Common.MultiConverter.Converters;
-
-/// <summary>
-/// Abstract base class for converters that export SolidWorks models to various formats.
-/// </summary>
-public abstract class BaseConverter(ISldWorks swApp) : IConverter
+namespace CADShark.Common.MultiConverter.Converters
 {
     /// <summary>
-    /// The SolidWorks application instance.
+    /// Abstract base class for converters that export SolidWorks models to various formats.
     /// </summary>
-    protected readonly ISldWorks SwApp = swApp;
-
-    /// <summary>
-    /// Exports the model to the specified path.
-    /// </summary>
-    /// <param name="model">The SolidWorks model document to export.</param>
-    /// <param name="path">The file path to save the exported file.</param>
-    /// <returns>True if the export was successful; otherwise, false.</returns>
-    public bool Export(ModelDoc2 model, string path)
+    public abstract class BaseConverter(ISldWorks swApp) : IConverter
     {
-        PrepareModel(model);
-        return DoExport(model, path);
-    }
+        protected readonly ISldWorks SwApp = swApp ?? throw new ArgumentNullException(nameof(swApp));
+        protected readonly CadLogger Logger = CadLogger.GetLogger<BaseConverter>();
 
-    /// <summary>
-    /// Prepares the model before export. Override in derived classes if needed.
-    /// </summary>
-    /// <param name="model">The SolidWorks model document to prepare.</param>
-    protected virtual void PrepareModel(ModelDoc2 model)
-    {
-        /* Common preparation */
-    }
+        /// <summary>
+        /// Exports the model to the specified path.
+        /// </summary>
+        public virtual bool Export(ModelDoc2 model, string path)
+        {
+            try
+            {
+                Logger.Info($"Starting export for {model?.GetTitle()} to {path}");
+                return DoExport(model, path);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Export failed for {model?.GetTitle()}", ex);
+                return false;
+            }
+        }
 
-    /// <summary>
-    /// Performs the actual export operation. Must be implemented in derived classes.
-    /// </summary>
-    /// <param name="model">The SolidWorks model document to export.</param>
-    /// <param name="path">The file path to save the exported file.</param>
-    /// <returns>True if the export was successful; otherwise, false.</returns>
-    protected abstract bool DoExport(ModelDoc2 model, string path);
+        public List<CutListItem> GetCutListData(ModelDoc2 model)
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Performs the actual export operation.
+        /// </summary>
+        protected abstract bool DoExport(ModelDoc2 model, string path);
+
+    }
 }

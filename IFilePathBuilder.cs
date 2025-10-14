@@ -1,4 +1,6 @@
-﻿namespace CADShark.Common.MultiConverter
+﻿using CADShark.Common.MultiConverter.Core;
+
+namespace CADShark.Common.MultiConverter
 {
     /// <summary>
     /// Interface for building file paths for exported files.

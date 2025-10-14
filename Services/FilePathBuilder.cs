@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using CADShark.Common.Logging;
+using CADShark.Common.MultiConverter.Core;
 
 namespace CADShark.Common.MultiConverter.Services;
 
@@ -45,17 +46,10 @@ public class FilePathBuilder : IFilePathBuilder
                 throw new InvalidOperationException($"Invalid source path: {sourcePath}");
             }
 
-            Logger.Debug($"directoryName {directoryName}");
-
-            //var fileName = Path.GetFileName(sourcePath);
             var outputFolder = !string.IsNullOrWhiteSpace(newSavePath)
                 ? newSavePath
                 : directoryName;
 
-
-            //var fullName = !string.IsNullOrEmpty(config)
-            //    ? Path.ChangeExtension($"{sourcePath}-{config}", extension.ToLowerInvariant())
-            //    : Path.ChangeExtension(sourcePath, extension.ToLowerInvariant());
             var fileNameWithoutExt = Path.GetFileNameWithoutExtension(sourcePath);
 
             var fullName = !string.IsNullOrEmpty(config)
