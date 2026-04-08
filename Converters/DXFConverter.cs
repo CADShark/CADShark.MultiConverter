@@ -1,4 +1,4 @@
-﻿using CADShark.Common.Logging;
+﻿// CADShark.Common.Logging;
 using SolidWorks.Interop.sldworks;
 using System;
 using System.Linq;
@@ -10,7 +10,7 @@ namespace CADShark.Common.MultiConverter.Converters;
 /// </summary>
 public class DxfConvert(ISldWorks swApp) : BaseConverter(swApp)
 {
-    private static readonly CadLogger Logger = CadLogger.GetLogger<DxfConvert>();
+    //private new static readonly CadLogger Logger = CadLogger.GetLogger<DxfConvert>();
 
     /// <summary>
     /// Gets or sets the export options for DXF.
@@ -27,7 +27,7 @@ public class DxfConvert(ISldWorks swApp) : BaseConverter(swApp)
     {
         if (model is not IPartDoc partDoc)
         {
-            Logger.Warning("Model is not a PartDoc");
+            //Logger.Warning("Model is not a PartDoc");
             return false;
         }
 
@@ -58,17 +58,17 @@ public class DxfConvert(ISldWorks swApp) : BaseConverter(swApp)
             var action = sheetMetal ? 1 : 2;
             object views = sheetMetal ? 0 : 3;
 
-            Logger.Debug($"Path export: {path}");
+            //Logger.Debug($"Path export: {path}");
 
             var status = partDoc.ExportToDWG2(path, modelName, action, true, alignment, false, false, options, views);
 
-            Logger.Debug($"Status export: {status} Configuration: {configName}");
+            //Logger.Debug($"Status export: {status} Configuration: {configName}");
             return status;
         }
         catch (Exception ex)
         {
             var error = $"Failed build dxf {model.GetTitle()} with configuration {configName} {ex.Message}";
-            Logger.Error(error);
+            //Logger.Error(error);
             return false;
         }
     }
@@ -88,4 +88,30 @@ public class DxfConvert(ISldWorks swApp) : BaseConverter(swApp)
 
         return vBodies.Cast<Body2>().Any(swBody => swBody.IsSheetMetal());
     }
+
+    /// <summary>
+    /// Extracts cut-list data for the given model.
+    /// </summary>
+    /// <param name="model">The SolidWorks model document.</param>
+    /// <returns>List of CutListItem for the model, or empty list if none found.</returns>
+    //public override List<CutListItem> GetCutListData(ModelDoc2 model)
+    //{
+    //    Logger.Info($"Extracting cut-list data for {model?.GetTitle()}");
+    //    try
+    //    {
+    //        var extractor = new SheetMetalCutListExtractor(model);
+    //        if (extractor.LoadCutList())
+    //        {
+    //            Logger.Info($"Extracted {extractor.CutListItems.Count} cut-list items");
+    //            return extractor.CutListItems;
+    //        }
+    //        Logger.Warning("No cut-list items found");
+    //        return [];
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Logger.Error($"Error extracting cut-list data for {model?.GetTitle()}", ex);
+    //        return [];
+    //    }
+    //}
 }

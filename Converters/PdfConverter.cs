@@ -1,4 +1,5 @@
-﻿using CADShark.Common.Logging;
+﻿//using CADShark.Common.Logging;
+using CADShark.Common.MultiConverter.Exceptions;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System;
@@ -14,7 +15,7 @@ namespace CADShark.Common.MultiConverter.Converters;
 /// </summary>
 public class PdfConverter(ISldWorks swApp) : BaseConverter(swApp)
 {
-    private static readonly CadLogger Logger = CadLogger.GetLogger<PdfConverter>();
+    //private new static readonly CadLogger Logger = CadLogger.GetLogger<PdfConverter>();
 
     /// <summary>
     /// Resolves all views in the drawing to full resolution.
@@ -48,8 +49,8 @@ public class PdfConverter(ISldWorks swApp) : BaseConverter(swApp)
         {
             status = swDrawDoc.ActivateSheet(sheetName);
 
-            Logger.Debug($@"Activates the specified drawing sheet: Sheet name: {sheetName}. Status: {status}");
-            if (!status) Logger.Error($@"Activates the specified drawing sheet: Sheet name: {sheetName}. Status: {status}");
+            //Logger.Debug($@"Activates the specified drawing sheet: Sheet name: {sheetName}. Status: {status}");
+            //if (!status) Logger.Error($@"Activates the specified drawing sheet: Sheet name: {sheetName}. Status: {status}");
 
             ResolveAllViews(swDrawDoc);
         }
@@ -61,8 +62,8 @@ public class PdfConverter(ISldWorks swApp) : BaseConverter(swApp)
 
         status = swExportPdfData.SetSheets((int)swExportDataSheetsToExport_e.swExportData_ExportAllSheets, sheets);
         
-        Logger.Debug($@"Sets the drawing sheets to export. Status: {status}");
-        if (!status) Logger.Error($@"Sets the drawing sheets to export.  Status: {status}");
+        //Logger.Debug($@"Sets the drawing sheets to export. Status: {status}");
+        //if (!status) Logger.Error($@"Sets the drawing sheets to export.  Status: {status}");
         
         swExportPdfData.ViewPdfAfterSaving = false;
 
@@ -80,15 +81,15 @@ public class PdfConverter(ISldWorks swApp) : BaseConverter(swApp)
         if (!status)
         {
             var errorDesc = SwSaveOperation.ParseSaveError((swFileSaveError_e)errors);
-            Logger.Error(
-                "Failed to export PDF {FilePath}. ErrorCode={ErrorCode}, Description={Description}",
-                path, errors, errorDesc
-            );
+            //Logger.Error(
+            //    "Failed to export PDF {FilePath}. ErrorCode={ErrorCode}, Description={Description}",
+            //    path, errors, errorDesc
+            //);
         }
         else
         {
-            Logger.Info($"PDF exported successfully:{path}");
-            if (warnings != 0) Logger.Warning("PDF export warning: {warnings}", warnings);
+            //Logger.Info($"PDF exported successfully:{path}");
+            //if (warnings != 0) Logger.Warning("PDF export warning: {warnings}", warnings);
         }
 
         return status;

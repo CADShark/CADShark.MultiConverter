@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
-using CADShark.Common.Logging;
+//using CADShark.Common.Logging;
+using CADShark.Common.MultiConverter.Core;
 
 namespace CADShark.Common.MultiConverter.Services;
 
@@ -9,7 +10,7 @@ namespace CADShark.Common.MultiConverter.Services;
 /// </summary>
 public class FilePathBuilder : IFilePathBuilder
 {
-    private static readonly CadLogger Logger = CadLogger.GetLogger<FilePathBuilder>();
+    //private static readonly CadLogger Logger = CadLogger.GetLogger<FilePathBuilder>();
 
     /// <summary>
     /// Builds the output file path.
@@ -25,7 +26,7 @@ public class FilePathBuilder : IFilePathBuilder
         {
             if (string.IsNullOrWhiteSpace(sourcePath))
             {
-                Logger.Error("Source path is null or empty");
+                //Logger.Error("Source path is null or empty");
                 throw new ArgumentException("Source path cannot be null or empty", nameof(sourcePath));
             }
 
@@ -41,21 +42,14 @@ public class FilePathBuilder : IFilePathBuilder
             var directoryName = Path.GetDirectoryName(sourcePath);
             if (string.IsNullOrEmpty(directoryName))
             {
-                Logger.Error("Directory name could not be resolved from path: {SourcePath}", sourcePath);
+                //Logger.Error("Directory name could not be resolved from path: {SourcePath}", sourcePath);
                 throw new InvalidOperationException($"Invalid source path: {sourcePath}");
             }
 
-            Logger.Debug($"directoryName {directoryName}");
-
-            //var fileName = Path.GetFileName(sourcePath);
             var outputFolder = !string.IsNullOrWhiteSpace(newSavePath)
                 ? newSavePath
                 : directoryName;
 
-
-            //var fullName = !string.IsNullOrEmpty(config)
-            //    ? Path.ChangeExtension($"{sourcePath}-{config}", extension.ToLowerInvariant())
-            //    : Path.ChangeExtension(sourcePath, extension.ToLowerInvariant());
             var fileNameWithoutExt = Path.GetFileNameWithoutExtension(sourcePath);
 
             var fullName = !string.IsNullOrEmpty(config)
@@ -65,17 +59,17 @@ public class FilePathBuilder : IFilePathBuilder
             if (!Directory.Exists(outputFolder))
             {
                 Directory.CreateDirectory(outputFolder);
-                Logger.Info($"Created output directory: {outputFolder}");
+                //Logger.Info($"Created output directory: {outputFolder}");
             }
 
             var resultPath = Path.Combine(outputFolder, fullName);
 
-            Logger.Trace($"Built file path: {resultPath}");
+            //Logger.Trace($"Built file path: {resultPath}");
             return resultPath;
         }
         catch (Exception ex)
         {
-            Logger.Error("Failed to build file path", ex);
+            //Logger.Error("Failed to build file path", ex);
             throw;
         }
     }

@@ -1,4 +1,5 @@
-﻿using CADShark.Common.Logging;
+﻿//using CADShark.Common.Logging;
+using CADShark.Common.MultiConverter.Exceptions;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System;
@@ -10,7 +11,7 @@ namespace CADShark.Common.MultiConverter.Converters;
 /// </summary>
 public class StepConverter(ISldWorks swApp) : BaseConverter(swApp)
 {
-    private static readonly CadLogger Logger = CadLogger.GetLogger<StepConverter>();
+    //private new static readonly CadLogger Logger = CadLogger.GetLogger<StepConverter>();
 
     /// <summary>
     /// Performs the STEP export.
@@ -36,22 +37,22 @@ public class StepConverter(ISldWorks swApp) : BaseConverter(swApp)
             if (!status)
             {
                 var errorDesc = SwSaveOperation.ParseSaveError((swFileSaveError_e)errors);
-                Logger.Error(
-                    "Failed to export STEP {FilePath}. ErrorCode={ErrorCode}, Description={Description}",
-                    path, errors, errorDesc
-                );
+                //Logger.Error(
+                //    "Failed to export STEP {FilePath}. ErrorCode={ErrorCode}, Description={Description}",
+                //    path, errors, errorDesc
+                //);
             }
             else
             {
-                Logger.Info($"STEP exported successfully: {path}");
-                if (warnings != 0) Logger.Warning("STEP export warning: {warnings}", warnings);
+                //Logger.Info($"STEP exported successfully: {path}");
+                //if (warnings != 0) Logger.Warning("STEP export warning: {warnings}", warnings);
             }
 
             return status;
         }
         catch (Exception ex)
         {
-            Logger.Error($"Failed to export STEP {model.GetTitle()}: {ex.Message}");
+            //Logger.Error($"Failed to export STEP {model.GetTitle()}: {ex.Message}");
             return false;
         }
     }

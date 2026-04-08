@@ -1,6 +1,6 @@
 ﻿using SolidWorks.Interop.sldworks;
 
-namespace CADShark.Common.MultiConverter.Converters
+namespace CADShark.Common.MultiConverter.Core
 {
     /// <summary>
     /// Interface for converters that export SolidWorks models.
@@ -14,5 +14,6 @@ namespace CADShark.Common.MultiConverter.Converters
         /// <param name="filePath">The file path to save the exported file.</param>
         /// <returns>True if the export was successful; otherwise, false.</returns>
         bool Export(ModelDoc2 model, string filePath);
+
     }
 }
