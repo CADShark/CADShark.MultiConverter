@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Extractors/CutListExtractorService.cs
+/Extractors/CutListItem.cs
+/Extractors/CutListPropertyReader.cs
+/Extractors/ExcelExporter.cs
