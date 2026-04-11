@@ -1,4 +1,4 @@
-﻿// CADShark.Common.Logging;
+﻿//using CADShark.Common.Logging;
 using SolidWorks.Interop.sldworks;
 using System;
 using System.Linq;
@@ -22,18 +22,33 @@ public class DxfConvert(ISldWorks swApp) : BaseConverter(swApp)
     /// </summary>
     /// <param name="model">The SolidWorks model document to export.</param>
     /// <param name="path">The file path to save the exported DXF file.</param>
+    /// <param name="configName">The configuration name to use for the export.</param>
     /// <returns>True if the export was successful; otherwise, false.</returns>
-    protected override bool DoExport(ModelDoc2 model, string path)
+    protected override bool DoExport(ModelDoc2 model, string path, string configName)
     {
+        bool status;
+
         if (model is not IPartDoc partDoc)
         {
             //Logger.Warning("Model is not a PartDoc");
             return false;
         }
 
-        var configManager = model.ConfigurationManager;
-        var configName = configManager.ActiveConfiguration.Name;
+        var activConfig = model.ConfigurationManager.ActiveConfiguration.Name;
+        
+        if (activConfig != configName)
+        {
+            status = model.ShowConfiguration2(configName);
+            Console.WriteLine(status);
+            if (!status)
+            {
+                //Logger.Warning($"Failed to switch to configuration {configName}");
+                return false;
+            }
+        }
 
+        
+        FeatureTraverser.UnsuppressFlatPatternFeatures(model);
         var sheetMetal = IsSheetMetalComponent(model);
 
         try
@@ -43,16 +58,18 @@ public class DxfConvert(ISldWorks swApp) : BaseConverter(swApp)
                 0.0,
                 0.0,
                 0.0,
-                1.0,
                 0.0,
                 0.0,
                 0.0,
-                1.0,
                 0.0,
                 0.0,
                 0.0,
-                1.0
+                0.0,
+                0.0,
+                0.0,
+                0.0
             };
+
             var options = Options.ToInt();
             var modelName = model.GetPathName();
             var action = sheetMetal ? 1 : 2;
@@ -60,7 +77,7 @@ public class DxfConvert(ISldWorks swApp) : BaseConverter(swApp)
 
             //Logger.Debug($"Path export: {path}");
 
-            var status = partDoc.ExportToDWG2(path, modelName, action, true, alignment, false, false, options, views);
+            status = partDoc.ExportToDWG2(path, modelName, action, true, alignment, false, false, options, views);
 
             //Logger.Debug($"Status export: {status} Configuration: {configName}");
             return status;
@@ -80,7 +97,8 @@ public class DxfConvert(ISldWorks swApp) : BaseConverter(swApp)
     /// <returns>True if at least one body is sheet metal; otherwise, false.</returns>
     public bool IsSheetMetalComponent(ModelDoc2 model)
     {
-        if (model is not IPartDoc swPart) return false;
+        var swPart = model as IPartDoc;
+        if (swPart == null) return false;
 
         var vBodies = (object[])swPart.GetBodies2(0, false);
 
@@ -88,30 +106,4 @@ public class DxfConvert(ISldWorks swApp) : BaseConverter(swApp)
 
         return vBodies.Cast<Body2>().Any(swBody => swBody.IsSheetMetal());
     }
-
-    /// <summary>
-    /// Extracts cut-list data for the given model.
-    /// </summary>
-    /// <param name="model">The SolidWorks model document.</param>
-    /// <returns>List of CutListItem for the model, or empty list if none found.</returns>
-    //public override List<CutListItem> GetCutListData(ModelDoc2 model)
-    //{
-    //    Logger.Info($"Extracting cut-list data for {model?.GetTitle()}");
-    //    try
-    //    {
-    //        var extractor = new SheetMetalCutListExtractor(model);
-    //        if (extractor.LoadCutList())
-    //        {
-    //            Logger.Info($"Extracted {extractor.CutListItems.Count} cut-list items");
-    //            return extractor.CutListItems;
-    //        }
-    //        Logger.Warning("No cut-list items found");
-    //        return [];
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        Logger.Error($"Error extracting cut-list data for {model?.GetTitle()}", ex);
-    //        return [];
-    //    }
-    //}
 }

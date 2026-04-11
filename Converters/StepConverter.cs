@@ -1,4 +1,5 @@
 ﻿//using CADShark.Common.Logging;
+
 using CADShark.Common.MultiConverter.Exceptions;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
@@ -18,42 +19,35 @@ public class StepConverter(ISldWorks swApp) : BaseConverter(swApp)
     /// </summary>
     /// <param name="model">The SolidWorks model document to export.</param>
     /// <param name="path">The file path to save the exported STEP file.</param>
+    /// <param name="config"></param>
     /// <returns>True if the export was successful; otherwise, false.</returns>
-    protected override bool DoExport(ModelDoc2 model, string path)
+    protected override bool DoExport(ModelDoc2 model, string path, string config)
     {
-        try
+        var errors = -1;
+        var warnings = -1;
+
+        var status = model.Extension.SaveAs3(path,
+            (int)swSaveAsVersion_e.swSaveAsCurrentVersion,
+            (int)swSaveAsOptions_e.swSaveAsOptions_Silent,
+            null,
+            null,
+            ref errors,
+            ref warnings);
+
+        if (!status)
         {
-            var errors = -1;
-            var warnings = -1;
-
-            var status = model.Extension.SaveAs3(path,
-                (int)swSaveAsVersion_e.swSaveAsCurrentVersion,
-                (int)swSaveAsOptions_e.swSaveAsOptions_Silent,
-                null,
-                null,
-                ref errors,
-                ref warnings);
-
-            if (!status)
-            {
-                var errorDesc = SwSaveOperation.ParseSaveError((swFileSaveError_e)errors);
-                //Logger.Error(
-                //    "Failed to export STEP {FilePath}. ErrorCode={ErrorCode}, Description={Description}",
-                //    path, errors, errorDesc
-                //);
-            }
-            else
-            {
-                //Logger.Info($"STEP exported successfully: {path}");
-                //if (warnings != 0) Logger.Warning("STEP export warning: {warnings}", warnings);
-            }
-
-            return status;
+            var errorDesc = SwSaveOperation.ParseSaveError((swFileSaveError_e)errors);
+            //Logger.Error(
+            //    "Failed to export STEP {FilePath}. ErrorCode={ErrorCode}, Description={Description}",
+            //    path, errors, errorDesc
+            //);
         }
-        catch (Exception ex)
+        else
         {
-            //Logger.Error($"Failed to export STEP {model.GetTitle()}: {ex.Message}");
-            return false;
+            //Logger.Info($"STEP exported successfully: {path}");
+            //if (warnings != 0) Logger.Warning("STEP export warning: {warnings}", warnings);
         }
+
+        return status;
     }
 }

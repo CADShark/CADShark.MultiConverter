@@ -22,55 +22,43 @@ public class FilePathBuilder : IFilePathBuilder
     /// <returns>The built file path.</returns>
     public string Build(string sourcePath, ExportFormat format, string config = null, string newSavePath = null)
     {
-        try
+        if (string.IsNullOrWhiteSpace(sourcePath))
         {
-            if (string.IsNullOrWhiteSpace(sourcePath))
-            {
-                //Logger.Error("Source path is null or empty");
-                throw new ArgumentException("Source path cannot be null or empty", nameof(sourcePath));
-            }
-
-            // Convert ExportFormat to string extension
-            var extension = format switch
-            {
-                ExportFormat.Pdf => "pdf",
-                ExportFormat.Dxf => "dxf",
-                ExportFormat.Step => "step",
-                _ => throw new ArgumentException($"Unsupported export format: {format}", nameof(format))
-            };
-
-            var directoryName = Path.GetDirectoryName(sourcePath);
-            if (string.IsNullOrEmpty(directoryName))
-            {
-                //Logger.Error("Directory name could not be resolved from path: {SourcePath}", sourcePath);
-                throw new InvalidOperationException($"Invalid source path: {sourcePath}");
-            }
-
-            var outputFolder = !string.IsNullOrWhiteSpace(newSavePath)
-                ? newSavePath
-                : directoryName;
-
-            var fileNameWithoutExt = Path.GetFileNameWithoutExtension(sourcePath);
-
-            var fullName = !string.IsNullOrEmpty(config)
-                ? $"{fileNameWithoutExt}-{config}.{extension.ToLowerInvariant()}"
-                : $"{fileNameWithoutExt}.{extension.ToLowerInvariant()}";
-
-            if (!Directory.Exists(outputFolder))
-            {
-                Directory.CreateDirectory(outputFolder);
-                //Logger.Info($"Created output directory: {outputFolder}");
-            }
-
-            var resultPath = Path.Combine(outputFolder, fullName);
-
-            //Logger.Trace($"Built file path: {resultPath}");
-            return resultPath;
+            //Logger.Error("Source path is null or empty");
+            throw new ArgumentException("Source path cannot be null or empty", nameof(sourcePath));
         }
-        catch (Exception ex)
+
+        // Convert ExportFormat to string extension
+        var extension = format switch
         {
-            //Logger.Error("Failed to build file path", ex);
-            throw;
+            ExportFormat.Pdf => "pdf",
+            ExportFormat.Dxf => "dxf",
+            ExportFormat.Step => "step",
+            _ => throw new ArgumentException($"Unsupported export format: {format}", nameof(format))
+        };
+
+        var directoryName = Path.GetDirectoryName(sourcePath);
+        if (string.IsNullOrEmpty(directoryName))
+        {
+            //Logger.Error("Directory name could not be resolved from path: {SourcePath}", sourcePath);
+            throw new InvalidOperationException($"Invalid source path: {sourcePath}");
         }
+
+        var outputFolder = !string.IsNullOrWhiteSpace(newSavePath)
+            ? newSavePath
+            : directoryName;
+
+        var fileNameWithoutExt = Path.GetFileNameWithoutExtension(sourcePath);
+
+        var fullName = !string.IsNullOrEmpty(config)
+            ? $"{fileNameWithoutExt}-{config}.{extension.ToLowerInvariant()}"
+            : $"{fileNameWithoutExt}.{extension.ToLowerInvariant()}";
+
+        if (!Directory.Exists(outputFolder)) Directory.CreateDirectory(outputFolder);
+        //Logger.Info($"Created output directory: {outputFolder}");
+        var resultPath = Path.Combine(outputFolder, fullName);
+
+        //Logger.Trace($"Built file path: {resultPath}");
+        return resultPath;
     }
 }

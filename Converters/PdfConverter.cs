@@ -1,11 +1,9 @@
 ﻿//using CADShark.Common.Logging;
+
 using CADShark.Common.MultiConverter.Exceptions;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System;
-using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
-using System.Text;
 using View = SolidWorks.Interop.sldworks.View;
 
 namespace CADShark.Common.MultiConverter.Converters;
@@ -36,8 +34,9 @@ public class PdfConverter(ISldWorks swApp) : BaseConverter(swApp)
     /// </summary>
     /// <param name="model">The SolidWorks model document to export.</param>
     /// <param name="path">The file path to save the exported PDF file.</param>
+    /// <param name="config"></param>
     /// <returns>True if the export was successful; otherwise, false.</returns>
-    protected override bool DoExport(ModelDoc2 model, string path)
+    protected override bool DoExport(ModelDoc2 model, string path, string config)
     {
         bool status;
         if (model is not DrawingDoc swDrawDoc) throw new ArgumentException("Model must be a drawing");
@@ -50,10 +49,11 @@ public class PdfConverter(ISldWorks swApp) : BaseConverter(swApp)
             status = swDrawDoc.ActivateSheet(sheetName);
 
             //Logger.Debug($@"Activates the specified drawing sheet: Sheet name: {sheetName}. Status: {status}");
-            //if (!status) Logger.Error($@"Activates the specified drawing sheet: Sheet name: {sheetName}. Status: {status}");
+            //if (!status) Logger.Error($@"Activates the specified drawing sheet: Sheet name: {sheetName}. Status: {false}");
 
             ResolveAllViews(swDrawDoc);
         }
+
         model.EditRebuild3();
         swDrawDoc.ForceRebuild();
 
@@ -61,10 +61,10 @@ public class PdfConverter(ISldWorks swApp) : BaseConverter(swApp)
 
 
         status = swExportPdfData.SetSheets((int)swExportDataSheetsToExport_e.swExportData_ExportAllSheets, sheets);
-        
+
         //Logger.Debug($@"Sets the drawing sheets to export. Status: {status}");
-        //if (!status) Logger.Error($@"Sets the drawing sheets to export.  Status: {status}");
-        
+        //if (!status) Logger.Error($@"Sets the drawing sheets to export.  Status: {false}");
+
         swExportPdfData.ViewPdfAfterSaving = false;
 
         var errors = -1;
@@ -93,55 +93,5 @@ public class PdfConverter(ISldWorks swApp) : BaseConverter(swApp)
         }
 
         return status;
-    }
-}
-
-internal static class SwFileSaveWarning
-{
-    // mapping of flag -> text
-    private static readonly (swFileSaveWarning_e Flag, string Text)[] s_map =
-    {
-        (swFileSaveWarning_e.swFileSaveWarning_AnimatorCameraViews, "Animator Camera Views"),
-        (swFileSaveWarning_e.swFileSaveWarning_AnimatorFeatureEdits, "Animator Feature Edits"),
-        (swFileSaveWarning_e.swFileSaveWarning_AnimatorLightEdits, "Animator Light Edits"),
-        (swFileSaveWarning_e.swFileSaveWarning_AnimatorNeedToSolve, "Animator Need To Solve"),
-        (swFileSaveWarning_e.swFileSaveWarning_AnimatorSectionViews, "Animator Section Views"),
-        (swFileSaveWarning_e.swFileSaveWarning_EdrwingsBadSelection, "Edrwings Bad Selection"),
-        (swFileSaveWarning_e.swFileSaveWarning_MissingOLEObjects, "Missing OLE Objects"),
-        (swFileSaveWarning_e.swFileSaveWarning_NeedsRebuild, "Needs Rebuild"),
-        (swFileSaveWarning_e.swFileSaveWarning_OpenedViewOnly, "Opened View Only"),
-        (swFileSaveWarning_e.swFileSaveWarning_RebuildError, "Rebuild Error"),
-        (swFileSaveWarning_e.swFileSaveWarning_ViewsNeedUpdate, "Views Need Update"),
-        (swFileSaveWarning_e.swFileSaveWarning_XmlInvalid, "Xml Invalid"),
-    };
-
-    private static readonly ConcurrentDictionary<swFileSaveWarning_e, string> s_cache = new();
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static string ParseSaveError(swFileSaveWarning_e warning)
-    {
-        if (warning == 0)
-            return string.Empty;
-
-        // cache lookup
-        if (s_cache.TryGetValue(warning, out var cached))
-            return cached;
-
-        var sb = new StringBuilder(64);
-        bool first = true;
-
-        foreach (var (flag, text) in s_map)
-        {
-            if ((warning & flag) != 0)
-            {
-                if (!first) sb.Append("; ");
-                first = false;
-                sb.Append(text);
-            }
-        }
-
-        var result = sb.ToString();
-        s_cache.TryAdd(warning, result);
-        return result;
     }
 }

@@ -44,13 +44,13 @@
   <ItemGroup>
     <Reference Include="SolidWorks.Interop.sldworks, Version=31.3.0.44, Culture=neutral, PublicKeyToken=7c4797c3e4eeac03, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-      <HintPath>..\References\2024\SolidWorks.Interop.sldworks.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <HintPath>..\References\SolidWorks.Interop.sldworks.dll</HintPath>
     </Reference>
     <Reference Include="SolidWorks.Interop.swconst, Version=31.3.0.44, Culture=neutral, PublicKeyToken=19f43e188e4269d8, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-      <HintPath>..\References\2024\SolidWorks.Interop.swconst.dll</HintPath>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+      <HintPath>..\References\SolidWorks.Interop.swconst.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -62,6 +62,7 @@
     <Compile Include="Converters\BaseConverter.cs" />
     <Compile Include="Converters\DxfConverter.cs" />
     <Compile Include="Converters\DxfExportOptions.cs" />
+    <Compile Include="Converters\FeatureTraverser.cs" />
     <Compile Include="Core\ExportFormat.cs" />
     <Compile Include="Core\IConverter.cs" />
     <Compile Include="Converters\PdfConverter.cs" />
@@ -74,6 +75,5 @@
     <Compile Include="Exceptions\swFileSaveWarning.cs" />
     <Compile Include="Exceptions\SwSaveOperation.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
